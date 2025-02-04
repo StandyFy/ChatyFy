@@ -20,13 +20,13 @@ Remember, this is an **unmoderated** chat space with **no language filters or ot
 ## How to compile
 ### **Step 1**:
 Make sure to install all librarys:
-`customtkinter`
-`screeninfo`
-`socket`
-`asyncio`
-`json`
-`threading`
-`cx_Freeze`
+`customtkinter`, 
+`screeninfo`, 
+`socket`, 
+`asyncio`, 
+`json`, 
+`threading`, 
+`cx_Freeze`,
 
 ### **Step 2:**
 Open your terminal and navigate to the `server.py`
