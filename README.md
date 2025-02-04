@@ -13,7 +13,7 @@ Run `server.py`, then enter an `IP address` or use `localhost` and enter a `port
 Now the user can start the client software and enter a `username`, `IP address`, and `port`.
 The client will then try to connect to the server. If it succeeds, the chat overlay will be shown, and messages can be sent.
 
-### **Disclaimer**
+## **Disclaimer**
 Remember, this is an **unmoderated** chat space with **no language filters or other protections**. 
 
 
