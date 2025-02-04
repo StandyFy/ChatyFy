@@ -28,11 +28,11 @@ Make sure to install all librarys:
 `threading`
 `cx_Freeze`
 
-## **Step 2:**
+### **Step 2:**
 Open your terminal and navigate to the `server.py`
 
-## **Step 3:**
+### **Step 3:**
 Run following command: `python setup.py build`
 
-## **Step 4:**
+### **Step 4:**
 Now you have an new folder where you find the `.exe`
