@@ -6,7 +6,7 @@ I had a lot of fun and pain working on this project.
 If you have any tipps or want to add extras please do so and let me know.
 
 ## How to use
-###**Step 1:**
+### **Step 1:**
 Run `server.py`, then enter an `IP address` or use `localhost` and enter a `port` where the server should listen.
 
 ### **Step 2**:
