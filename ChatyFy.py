@@ -4,7 +4,69 @@ import socket
 import asyncio
 import json
 import threading
+import winreg
 
+class Style():
+    def __init__(self):
+        pass
+
+    def setTheme(self, theme):
+        if theme == 'light':
+           color = {
+                'main_bg': '#dcdcdc',
+                'frame_fg': '#ffffff',
+                'font_color': '#000000',
+                'login_entry_fg': '#dcdcdc',
+                'placeolder_color': '#7b7b7b',
+                'login_btn_bg': '#000000',
+                'login_btn_fg': '#0080d8',
+                'login_btn_hover': '#006ab3',
+                'transparent': 'transparent',
+                "error_msg": "#ff0000"
+            }
+           
+        if theme == 'dark':
+            color = {
+                'main_bg': '#363636',
+                'frame_fg': '#000000',
+                'font_color': '#ffffff',
+                'login_entry_fg': '#363636',
+                'placeolder_color': '#7b7b7b',
+                'login_btn_bg': '#000000',
+                'login_btn_fg': '#0080d8',
+                'login_btn_hover': '#006ab3',
+                'transparent': 'transparent',
+                "error_msg": "#ff0000"
+            }
+
+        if theme == 'unknown':
+            print("Unknown theme")
+            input("Press enter to exit")
+            quit()
+            exit()
+
+
+        if self.isJson(color):
+            return json.dumps(color)
+
+        else: 
+            return color
+        
+    def GetSysTheme(self):
+        registry = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
+        key = winreg.OpenKey(registry, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize')
+
+        try:
+            theme_val = winreg.QueryValueEx(key, 'AppsUseLightTheme')[0]
+            return 'light' if theme_val == 1 else 'dark'
+        except FileNotFoundError:
+            return 'unknown'
+
+    def isJson(self, json_obj):
+        try:
+            return True
+        except ValueError as e:
+            return False
 
 class Main(ctk.CTk):
     def __init__(self):
@@ -19,43 +81,49 @@ class Main(ctk.CTk):
 
         # Window Variables
         titleText = "ChatyFy"
-        self.windowWidth = self.handler.getWindowSize()[0]
-        self.windowHeight = self.handler.getWindowSize()[1]
+        window_size = self.handler.getWindowSize()
+        self.windowWidth = window_size[0]
+        self.windowHeight = window_size[1]
 
         # Set up default window
         self.title(titleText)
         self.geometry(f"{self.windowWidth}x{self.windowHeight}")
         self.resizable(0, 0)
 
+        # Set Styles
+        styleClass = Style()
+        style = styleClass.setTheme(styleClass.GetSysTheme())
+        self.style = json.loads(style)
+
         self.DisplayLogin()
 
     # Login frame
     def DisplayLogin(self):
         # Create login frame
-        self.loginFrame = ctk.CTkFrame(self, width=self.windowWidth, height=self.windowHeight)
+        self.loginFrame = ctk.CTkFrame(self, width=self.windowWidth, height=self.windowHeight, fg_color=self.style['main_bg'], bg_color=self.style['main_bg'])
         self.loginFrame.place(x=0, y=0)
         # Login frame items
         # Login background
-        self.loginBG = ctk.CTkFrame(self.loginFrame, width=self.windowWidth//2, height=self.windowHeight*0.65, fg_color="black", corner_radius=15)
+        self.loginBG = ctk.CTkFrame(self.loginFrame, width=self.windowWidth//2, height=self.windowHeight*0.65, fg_color=self.style['frame_fg'], corner_radius=15)
         self.loginBG.place(relx=0.5, rely=0.5, anchor="center")
         # Login header
-        self.header = ctk.CTkLabel(self.loginBG, text="Login to local chatroom", font=("Arial", 50), fg_color="black")
+        self.header = ctk.CTkLabel(self.loginBG, text="Login to local chatroom", font=("Arial", 50), fg_color=self.style['frame_fg'], text_color=self.style['font_color'])
         self.header.place(relx=0.5, rely=0.1, anchor="center")
         # Username entry
-        self.usernameEntry = ctk.CTkEntry(self.loginBG, width=250, height=50, placeholder_text="Username", font=("Arial", 25), bg_color="transparent", text_color="white")
+        self.usernameEntry = ctk.CTkEntry(self.loginBG, width=250, height=50, placeholder_text="Username", font=("Arial", 25), bg_color=self.style['transparent'], text_color=self.style['font_color'], fg_color=self.style['login_entry_fg'], placeholder_text_color=self.style['placeolder_color'])
         self.usernameEntry.place(relx=0.5, rely=0.25, anchor="center")
         # IP entry
-        self.ipEntry = ctk.CTkEntry(self.loginBG, width=250, height=50, placeholder_text="IP Address", font=("Arial", 25), bg_color="transparent", text_color="white")
+        self.ipEntry = ctk.CTkEntry(self.loginBG, width=250, height=50, placeholder_text="IP Address", font=("Arial", 25), bg_color=self.style['transparent'], text_color=self.style['font_color'], fg_color=self.style['login_entry_fg'], placeholder_text_color=self.style['placeolder_color'])
         self.ipEntry.place(relx=0.5, rely=0.40, anchor="center")
         # Port entry
-        self.portEntry = ctk.CTkEntry(self.loginBG, width=250, height=50, placeholder_text="Port", font=("Arial", 25), bg_color="transparent", text_color="white")
+        self.portEntry = ctk.CTkEntry(self.loginBG, width=250, height=50, placeholder_text="Port", font=("Arial", 25), bg_color=self.style['transparent'], text_color=self.style['font_color'], fg_color=self.style['login_entry_fg'], placeholder_text_color=self.style['placeolder_color'])
         self.portEntry.place(relx=0.5, rely=0.55, anchor="center")
         # Login button
-        self.loginBtn = ctk.CTkButton(self.loginBG, text="Login", width=250, height=50, font=("Arial", 25), command=self.ShowChatRoom)
+        self.loginBtn = ctk.CTkButton(self.loginBG, text="Login", width=250, height=50, font=("Arial", 25), command=self.ShowChatRoom, fg_color=self.style['login_btn_fg'], text_color=self.style['font_color'], hover_color=self.style['login_btn_hover'])
         self.loginBtn.place(relx=0.5, rely=0.70, anchor="center")
 
         # Error messages
-        self.errorLabel = ctk.CTkLabel(self.loginBG, text="", font=("Arial", 25), text_color="red")
+        self.errorLabel = ctk.CTkLabel(self.loginBG, text="", font=("Arial", 25), text_color=self.style['error_msg'])
         self.errorLabel.place(relx=0.5, rely=0.85, anchor="center")
 
     # Handle login
@@ -117,14 +185,14 @@ class Main(ctk.CTk):
         asyncio.run_coroutine_threadsafe(self.connectionToServer(), self.loop)
 
         # Create chat frame
-        self.chatframe = ctk.CTkFrame(self, width=self.windowWidth, height=self.windowHeight)
+        self.chatframe = ctk.CTkFrame(self, width=self.windowWidth, height=self.windowHeight, fg_color=self.style['main_bg'], bg_color=self.style['main_bg'])
         self.chatframe.place(x=0, y=0)
         # Chat frame items
-        self.chatBox = ctk.CTkScrollableFrame(self.chatframe, width=self.windowWidth//1.1, height=self.windowHeight//1.25, fg_color="black")
+        self.chatBox = ctk.CTkScrollableFrame(self.chatframe, width=self.windowWidth//1.1, height=self.windowHeight//1.25, fg_color=self.style['frame_fg'])
         self.chatBox.place(relx=0.5, rely=.425, anchor="center")
-        self.enterMessage = ctk.CTkEntry(self.chatframe, width=(self.windowWidth//1.1) - 150, height=100, placeholder_text="Enter Message", bg_color="transparent", font=self.enterMessageFont, text_color="white")
+        self.enterMessage = ctk.CTkEntry(self.chatframe, width=(self.windowWidth//1.1) - 150, height=100, placeholder_text="Enter Message", bg_color=self.style['transparent'], font=self.enterMessageFont, text_color=self.style['font_color'], fg_color=self.style['login_entry_fg'], placeholder_text_color=self.style['placeolder_color'])
         self.enterMessage.place(x=self.windowWidth-((self.windowWidth//1.1) + 75), y=self.windowHeight-125)
-        self.sendMessageBtn = ctk.CTkButton(self.chatframe, text="Send", width=25, height=100, font=self.enterMessageFont, command=self.btnCommandSendMsgToServer)
+        self.sendMessageBtn = ctk.CTkButton(self.chatframe, text="Send", width=25, height=100, font=self.enterMessageFont, command=self.btnCommandSendMsgToServer, fg_color=self.style['login_btn_fg'], text_color=self.style['font_color'], )
         self.sendMessageBtn.place(x=self.windowWidth-175, y=self.windowHeight-125)
 
     def start_loop(self, loop):
@@ -159,6 +227,14 @@ class Main(ctk.CTk):
 
     def btnCommandSendMsgToServer(self):
         message = self.enterMessage.get()
+
+        # Check if message is empty and dont send
+        if message == "" or message.isspace() or message == None:
+            return
+
+        # Clear message box
+        self.enterMessage.delete(0, 'end')
+
         self.MyMessages(message)
         asyncio.run_coroutine_threadsafe(self.sendMsgToServer(message), self.loop)
 
@@ -202,13 +278,12 @@ class Handler():
 
     def getWindowSize(self):
         for monitor in get_monitors():
-            width = monitor.width
-            height = monitor.height
+            if monitor.is_primary:
+                print(monitor)
+                width:int = monitor.width * 0.75  # WTF THIS IS CURSED AS HELL
+                height = monitor.height * 0.90
 
-        programm_width = width - 600
-        programm_height = height - 125
-
-        return [programm_width, programm_height]
+        return [int(width), int(height)]
 
 if __name__ == '__main__':
     app = Main()
