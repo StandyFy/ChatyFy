@@ -5,6 +5,9 @@ import asyncio
 import json
 import threading
 import winreg
+from win10toast import ToastNotifier as TN
+import os
+import configparser
 
 class Style():
     def __init__(self):
@@ -22,6 +25,7 @@ class Style():
                 'login_btn_fg': '#0080d8',
                 'login_btn_hover': '#006ab3',
                 'transparent': 'transparent',
+                'usernameColor': "#000000",
                 "error_msg": "#ff0000"
             }
            
@@ -36,6 +40,7 @@ class Style():
                 'login_btn_fg': '#0080d8',
                 'login_btn_hover': '#006ab3',
                 'transparent': 'transparent',
+                'usernameColor': "#ffffff",
                 "error_msg": "#ff0000"
             }
 
@@ -263,7 +268,7 @@ class Main(ctk.CTk):
 
     def OtherMessages(self, name, msg):
         # Display name of sender of msg
-        msgName = ctk.CTkLabel(self.chatBox, text=name, text_color="white")
+        msgName = ctk.CTkLabel(self.chatBox, text=name, text_color=self.style["usernameColor"], fg_color=self.style['transparent'])
         msgName.pack(pady=0, padx=25, anchor="w")
         # Create text box for msg
         msgFrame = ctk.CTkFrame(self.chatBox, width=len(msg) * 10 + 150, height=50, fg_color="#d3d3d3")
@@ -271,6 +276,17 @@ class Main(ctk.CTk):
         # Create msg label
         msgLabel = ctk.CTkLabel(msgFrame, text=msg, text_color="black", fg_color="#d3d3d3")
         msgLabel.pack(padx=5, pady=5)
+
+        #check if user has notifications enabled
+        cp = configparser.ConfigParser()
+        cp.read(os.path.dirname(os.path.abspath(__file__)) + '\\config.ini')
+        if cp.getboolean("chatapp", "notifications") == True:
+            # Notify user if window is not focus
+            handler = Handler()
+            if(self.focus_get() is None):
+                handler.notification(username=name)
+
+
 
 class Handler():
     def __init__(self):
@@ -284,6 +300,18 @@ class Handler():
                 height = monitor.height * 0.90
 
         return [int(width), int(height)]
+    
+    def notification(self, username:str = "N/A"):
+        currentDir = os.path.dirname(os.path.abspath(__file__))
+
+        toast = TN()
+        toast.show_toast(
+            "ChatyFy",
+            f"You have a new message from: {username}",
+            duration=15,
+            icon_path= currentDir + "\\resources\\ChatyFyLogo.ico",
+            threaded=True
+        )
 
 if __name__ == '__main__':
     app = Main()

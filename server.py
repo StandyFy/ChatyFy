@@ -6,6 +6,7 @@ class Server:
     def __init__(self):
         self.c = ConsoleColors()
         self.connections = []  # List to store active connections
+        self.connected_users = []  # List to store connected users
         
         # Get host and port from user
         self.host, self.port = self.getHostAndIp()
@@ -48,7 +49,8 @@ class Server:
 
                 # Decode the data from bytes to string
                 data = data.decode()
-                print(f"Raw data received: {data}")  # Debugging line to print raw data
+
+                print(f"{self.c.OKCYAN}Received: {len(data.encode('utf-8'))} Bytes{self.c.ENDC}")
 
                 try:
                     # Parse the JSON string into a dictionary
@@ -63,6 +65,8 @@ class Server:
 
                 if username and usermessage:
                     # Broadcast the message to all other clients
+                    self.connected_users.append(username)
+
                     await self.sendToAll(conn, json.dumps({"username": username, "message": usermessage}))
                 else:
                     print(f"{self.c.FAIL}Invalid data received{self.c.ENDC}")
